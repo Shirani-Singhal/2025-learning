@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<head>
+   
+</head>
+<body bgcolor="grey">
+<center>
+   <h1 style="font-size: 45px;">CRUD Operations with Express & MongoDB</h1>
+
+<table border="1" style="width: 60%; height:100%;font-size: 20px; text-align: left; padding-left: 30px;" cellspacing="10" cellpadding="10">
+    <tr>
+        <th>Field</th>
+        <th>Input</th>
+    </tr>
+    <tr>
+        <td>Enter ID</td>
+        <td><input type="number" id="t1"></td><br>
+    </tr>
+    <tr>
+        <td>Enter employee ID</td>
+        <td><input type="text" id="t2"></td><br>
+    </tr>
+    <tr>
+        <td>Enter name</td>
+        <td><input type="text" id="t3"></td><br>
+    </tr>
+    <tr>
+        <td>Enter age</td>
+        <td><input type="number" id="t4"></td><br>
+    </tr>
+</table>
+
+<br>
+
+<table style="width: 100%; text-align: center;">
+    <tr>
+        <td><button style="font-size: 20px;" id="b1" onclick="addRecord()">Add Record</button></td>
+        <td><button style="font-size: 20px;" id="b2" onclick="getRecord()">Get Record</button></td>
+        <td><button style="font-size: 20px;" id="b3" onclick="updateRecord()">Update Record</button></td>
+        <td><button style="font-size: 20px;" id="b4" onclick="deleteRecord()">Delete Record</button></td>
+     
+    </tr>
+</table>
+<script>
+    async function addRecord() {
+        const id = Number(document.getElementById("t1").value);
+        const employee_Id = document.getElementById("t2").value;
+        const name = document.getElementById("t3").value;               
+        const age = Number(document.getElementById("t4").value);
+        const response = await fetch("http://localhost:3000/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+          body: JSON.stringify({ _id: id, employee_ID: employee_Id, name, age })
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert("Record added successfully!");
+        } else {
+            alert("Error adding record: " + data.message);
+        }
+    }
+  async function getRecord() {
+    console.log("Fetching all records...");
+    
+    const response = await fetch(`http://localhost:3000/readalldata`);
+    const data = await response.json();
+    
+    console.log("Data received:", data); // Debugging
+    
+    if (data.success && data.records.length > 0) {
+        alert("Records found: " + JSON.stringify(data.records) ); // Display all records
+    } else {
+        alert("Error fetching records: " + (data.message || "Unknown error"));
+    }
+}
+ async function  updateRecord() {
+    const id = Number(document.getElementById("t1").value);
+    const employee_Id = document.getElementById("t2").value;
+    const name = document.getElementById("t3").value;               
+    const age = Number(document.getElementById("t4").value);
+      console.log("Updating record for ID:", id);
+
+    const response = await fetch(`http://localhost:3000/update/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ _id:id, employee_ID: employee_Id, name, age })
+    });
+    
+    const data = await response.json();
+     console.log("Update response:", data);
+
+    if (data.success) {
+        alert("Record updated successfully!");
+    } else {
+        alert("Error updating record: " + data.message);
+    }
+
+    getRecord(); 
+ }   
+async function deleteRecord() {
+    const id = Number(document.getElementById("t1").value);
+    console.log("Deleting record with ID:", id);
+    
+    const response = await fetch(`http://localhost:3000/delete/${id}`, {
+        method: "DELETE"
+    });
+    
+    const data = await response.json();
+    console.log("Delete response:", data);
+    
+    if (data.success) {
+        alert("Record deleted successfully!");
+    } else {
+        alert("Error deleting record: " + data.message);
+    }
+    getRecord();
+}
+</script>
+</center>   
+</body>
+</html>

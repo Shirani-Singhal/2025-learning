@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<head>
+    <title> Frontend+Backend+Model</title>
+</head>
+<body bgcolor="rgba(10, 40, 20, 0.1)">
+<center>
+    <label style="font-size: 30px; margin-top: 60px; padding-top: 30px;">Enter ID</label>
+    <input type="number" id="t1"><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Enter Name</label>
+    <input type="text" id="t2"><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Enter Gender</label>
+    <select id="t5" style="font-size: 30px; margin-top: 30px;">
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+    </select><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Enter Age</label>
+    <input type="number" id="t3"><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Select Course</label>
+    <select id="t4" style="font-size: 30px; margin-top: 30px;">
+        <option value="CSE">CSE</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+    </select><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Enter Marks</label><br>
+    <input type="number" id="maths" placeholder="Maths">
+    <input type="number" id="english" placeholder="English">
+    <input type="number" id="hindi" placeholder="Hindi">
+    <input type="number" id="chemistry" placeholder="Chemistry">
+    <input type="number" id="physics" placeholder="Physics"><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Enter City</label>
+    <input type="text" id="city"><br><br>
+
+    <label style="font-size: 30px; margin-top: 30px;">Sports Participation</label>
+    <select id="sports" style="font-size: 30px; margin-top: 30px;">
+        <option value="play">Play</option>
+        <option value="not play">Not Play</option>
+    </select><br><br>
+
+    <button style="font-size: 30px; margin-top: 30px;" id="b1" onclick="addRecord()">Add Record</button>
+    <button style="font-size: 30px; margin-top: 30px;" id="b2" onclick="getRecord()">Get Record</button>
+    <button style="font-size: 30px; margin-top: 30px;" id="b3" onclick="updateRecord()">Update Record</button>
+    <button style="font-size: 30px; margin-top: 30px;" id="b4" onclick="deleteRecord()">Delete Record</button>
+    <button style="font-size: 30px; margin-top: 30px;" id="b5" onclick="getAllRecords()">Get All Records</button>
+</center>
+<script>
+    async function addRecord() {
+        const id = Number(document.getElementById("t1").value);
+        const name = document.getElementById("t2").value;
+        const gender =document.getElementById("t5").value;
+        const age = Number(document.getElementById("t3").value);
+        const course = document.getElementById("t4").value;
+        const maths = Number(document.getElementById("maths").value);
+        const english = Number(document.getElementById("english").value);
+        const hindi = Number(document.getElementById("hindi").value);
+        const chemistry = Number(document.getElementById("chemistry").value);
+        const physics = Number(document.getElementById("physics").value);
+        const city = document.getElementById("city").value;
+        const sports = document.getElementById("sports").value;
+        const response = await fetch('http://localhost:3000/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+    _id: id,
+    fields: {  // Wrap attributes inside "fields"
+        name,
+        gender,
+        age,
+        department: course,  // "department" in schema matches "course" in frontend
+        marks: { maths, english, hindi, chemistry, physics },
+        city,
+        sports
+    }
+})
+        });
+       const data = await response.json();
+if (response.ok) {
+    alert("Record added successfully: " + (data.message || "No message provided"));
+} else {
+    alert("Error adding record: " + (data.message || "Unknown error"));
+}
+    }
+    async function getRecord() {
+        const id = document.getElementById("t1").value;
+        const response = await fetch(` http://localhost:3000/readspecificdata/${id}`);
+        const data = await response.json();
+        if (data.success) {
+            const record = data.record;
+            document.getElementById("t2").value = record.name;
+            document.getElementById("t5").value = record.gender;
+            document.getElementById("t3").value = record.age;
+            document.getElementById("t4").value = record.course;
+            document.getElementById("maths").value = record.marks.maths;
+            document.getElementById("english").value = record.marks.english;
+            document.getElementById("hindi").value = record.marks.hindi;
+            document.getElementById("chemistry").value = record.marks.chemistry;
+            document.getElementById("physics").value = record.marks.physics;
+            document.getElementById("city").value = record.city;
+            document.getElementById("sports").value = record.sports;
+                   alert("Record retrieved successfully: " + (data.message || "No message provided"));
+        } else {
+            alert("Error fetching record: " + data.message || "Unknown error");
+        }
+    }
+    async function updateRecord() {
+        const id = document.getElementById("t1").value;
+        const name = document.getElementById("t2").value
+        const gender = document.getElementById("t5").value;
+        const age = document.getElementById("t3").value;    
+        const course = document.getElementById("t4").value;
+        const maths = document.getElementById("maths").value;
+        const english = document.getElementById("english").value;
+        const hindi = document.getElementById("hindi").value;
+        const chemistry = document.getElementById("chemistry").value;
+        const physics = document.getElementById("physics").value;   
+        const city = document.getElementById("city").value;
+        const sports = document.getElementById("sports").value;
+        console.log("Updating record for ID:", id); 
+        const response = await fetch(`http://localhost:3000/update/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+             body: JSON.stringify({
+            fields: {  
+                name,
+                gender,
+                age,
+                department:course,
+                marks: { maths, english, hindi, chemistry, physics },
+                city,
+                sports
+            }
+        })
+    });
+        const data = await response.json();
+        if (data.success) {
+            alert("Record updated successfully");
+        } else {
+            alert("Error updating record: " + data.message);
+        }
+    }
+   async function deleteRecord() {
+    const id = document.getElementById("t1").value;
+    console.log("Deleting record with ID:", id); // ✅ Debugging
+
+    const response = await fetch(`http://localhost:3000/delete/${id}`, {
+        method: 'DELETE'
+    });
+
+    console.log("Response Status:", response.status); // ✅ Debugging
+    const data = await response.json();
+    console.log("Response Data:", data); // ✅ Debugging
+
+    if (response.ok && data.success) {
+        alert("Record deleted successfully: " + (data.message || "No message provided"));
+    } else {
+        alert("Error deleting record: " + (data.message || "Unknown error"));
+    }
+}
+    async function getAllRecords() {
+    console.log("Fetching all records..."); // ✅ Debugging before request
+
+    try {
+        const response = await fetch('http://localhost:3000/readalldata');
+
+        console.log("Response Status:", response.status); // ✅ Check response code
+
+        if (!response.ok) {
+            console.error("Fetch failed with status:", response.status);
+            alert("Error fetching records: Server error");
+            return;
+        }
+
+        const data = await response.json();
+        console.log("Response Data:", data); // ✅ Inspect API response
+
+        if (data.success) {
+            console.log("Fetched Records:", data.records);
+            alert("Records fetched successfully. Check console for details.");
+        } else {
+            alert("Error fetching records: " + (data.message || "Unknown error"));
+        }
+    } catch (error) {
+        console.error("Error occurred:", error);
+        alert("Network error. Check console for details.");
+    }
+}
+</script>
+</body>
+</html>
+
+
+   

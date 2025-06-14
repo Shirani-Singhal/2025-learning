@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+</html>
+<body bgcolor="coral">
+    <center>
+        <h1 style="font-size: 45px;color:blueviolet">ITM University Gwalior folks Registration Page</h1>
+        <form >
+            <table border="1"  style="width: 30% ;height:100%; font-size: 20px; text-align: center; padding-left: 0px;" cellspacing="10" cellpadding="10">
+                <tr>
+                <th style="font-size: 25px;color: white;border: 1px solid #ccc; border-radius: 10px;box-shadow: rgb(175, 165, 165) ;">
+                    id <br>
+                    <input type="number" name="id" id="t1"required><br><br>
+                    Full Name<br>
+                    <input type="text" name="name" id="t2"required><br><br>
+               
+                    Email Address<br>
+                    <input type="email" name="email" id="t3" required><br><br>
+                
+                    Username<br>
+                    <input type="text" name="username" id="t4"required><br><br>
+              
+                    Password<br>
+                    <input type="password" name="password" id="t5"required><br><br>
+                
+                    Confirm Password <br>
+                    <input type="password" name="confirm_password" id="t6" required><br><br>
+                
+             
+            <center><button type="submit" style="font-size: 25px;">Register</button></center></th>
+            </tr>
+            <td>
+                 <button style="font-size: 14px; margin-top: 0px;" id="b1" onclick="addRecord()">Add Record</button>
+    <button style="font-size: 14px; margin-top: 0px;" id="b2" onclick="getRecord()">Get Record</button>
+    <button style="font-size: 14px; margin-top: 0px;" id="b3" onclick="updateRecord()">Update Record</button>
+    <button style="font-size: 14px; margin-top: 0px;" id="b4" onclick="deleteRecord()">Delete Record</button>
+            </td>
+             </table>
+        </form>
+    </center>
+    <script>
+       async function addRecord() {
+            const id = Number(document.querySelector("input[name='id']").value);
+            const full_name = document.querySelector("input[name='name']").value;
+            const email = document.querySelector("input[name='email']").value;
+            const username = document.querySelector("input[name='username']").value;
+            const password = document.querySelector("input[name='password']").value;
+            const confirm_password = document.querySelector("input[name='confirm_password']").value;
+
+            if (password !== confirm_password) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            const response = await fetch("http://localhost:3000/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ _id:id, full_name, email, username, password ,confirm_password})
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert("Record added successfully!");
+            } else {
+                alert("Error adding record: " + data.message);
+            }
+            getRecord(); 
+        }
+        
+        async function getRecord() {
+    console.log("Fetching all records...");
+    
+    const response = await fetch(`http://localhost:3000/readalldata`);
+    const data = await response.json();
+    
+    console.log("Data received:", data); // Debugging
+    
+    if (data.success && data.records.length > 0) {
+        alert("Records found: " + JSON.stringify(data.records) ); // Display all records
+    } else {
+        alert("Error fetching records: " + (data.message || "Unknown error"));
+    }
+}
+ async function updateRecord(){
+      const id = Number(document.getElementById("t1").value);
+        const full_name = document.getElementById("t2").value
+        const email = document.getElementById("t3").value;
+        const username = document.getElementById("t4").value;
+        const password = document.getElementById("t5").value
+        const confirm_password = document.getElementById("t6").value;
+        if (password !== confirm_password) {
+            alert("Passwords do not match!");
+            return;
+        }
+        const response = await fetch(`http://localhost:3000/update/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ _id:id, full_name, email, username, password ,confirm_password})
+        });
+        const data = await response.json();
+        console.log("Server response:", data);
+        getRecord();
+        if (data.success) {
+            alert("Record updated successfully!");
+        } else {
+            alert("Error updating record: " + data.message);
+        }
+
+ }
+ async function deleteRecord() {
+           const id = Number(document.getElementById("t1").value);
+        const response = await fetch(`http://localhost:3000/delete/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        const data = await response.json();
+        console.log("Delete response:", data);
+        if (data.success) {
+            alert("Record deleted successfully!");
+        } else {
+            alert("Error deleting record: " + data.message);
+        }
+        getRecord();
+    }
+    
+        </script>
+    
+</body>
